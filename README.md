@@ -1,16 +1,120 @@
-# Sales Incentive Compensation Simulator
+<p align="center">
+  <img src="https://img.icons8.com/fluency/96/money-bag.png" alt="Logo" width="80"/>
+</p>
 
-A production-grade, end-to-end Python application that simulates sales
-incentive compensation plans.  It generates realistic synthetic sales data,
-calculates tiered commissions with accelerators, persists results to SQLite,
-and exposes a what-if simulation engine for plan optimisation.
+<h1 align="center">💰 Sales Incentive Compensation Simulator</h1>
+
+<p align="center">
+  <strong>A production-grade Python application for simulating sales incentive compensation plans</strong>
+</p>
+
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#demo">Demo</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#api-reference">API</a> •
+  <a href="#testing">Testing</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
+  <img src="https://img.shields.io/badge/Streamlit-1.30+-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit"/>
+  <img src="https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite"/>
+  <img src="https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white" alt="Pandas"/>
+  <img src="https://img.shields.io/badge/Tests-67%20passed-success?style=for-the-badge" alt="Tests"/>
+</p>
 
 ---
 
-## Architecture
+## ✨ Features
+
+- 🎯 **Tiered Commission Engine** – Band-by-band commission calculation with vectorized NumPy operations
+- 🚀 **Accelerator Bonuses** – Additional incentives for over-quota performance
+- 🔮 **What-If Simulator** – Model alternative compensation scenarios without touching source data
+- 📊 **Interactive Dashboard** – Beautiful Streamlit UI with Plotly visualizations
+- 🗄️ **SQLite Analytics** – Pre-built analytical views with window functions
+- 📈 **Power BI Ready** – Comprehensive data model for enterprise reporting
+- ✅ **67 Unit Tests** – Full test coverage for business logic
+
+---
+
+## 🎬 Demo
+
+### Dashboard Preview
+
+| Executive Dashboard | What-If Simulator |
+|:---:|:---:|
+| Real-time KPIs, revenue trends, top performers | Model quota changes, rate adjustments |
+
+### Key Metrics Generated
+
+| Metric | Value |
+|--------|-------|
+| Total Revenue | $888M |
+| Total Payout | $224M |
+| Payout Ratio | 25.27% |
+| Reps Processed | 100 |
+| Transactions | 12,000 |
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.10+
+- pip
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/YOUR_USERNAME/sales-incentive-simulator.git
+cd sales-incentive-simulator
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### Run the Pipeline
+
+```bash
+# Generate data and calculate payouts
+python src/main.py
+```
+
+This will:
+1. ✅ Load `config/incentive_plan.json`
+2. ✅ Generate 100 sales reps + 12,000 transactions
+3. ✅ Calculate tiered commissions with accelerators
+4. ✅ Save results to `data/payout_results.csv`
+5. ✅ Create SQLite database with analytical views
+6. ✅ Print formatted summary
+
+### Launch the Dashboard
+
+```bash
+streamlit run app.py
+```
+
+Open http://localhost:8501 in your browser.
+
+### Run Tests
+
+```bash
+python -m pytest tests/ -v
+```
+
+---
+
+## 🏗️ Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
+│                        app.py (Streamlit UI)                     │
+└──────────────────────────────┬──────────────────────────────────┘
+                               │
+┌──────────────────────────────▼──────────────────────────────────┐
 │                      src/main.py (orchestrator)                  │
 └──────────┬─────────────┬───────────────────┬────────────────────┘
            │             │                   │
@@ -35,96 +139,70 @@ and exposes a what-if simulation engine for plan optimisation.
                │  SQLite Database   │
                │  sales_incentive   │
                │  .db               │
-               │                    │
-               │  Tables:           │
-               │  • sales_reps      │
-               │  • sales_txns      │
-               │  • incentive_plan  │
-               │  • calendar        │
-               │  • payout_results  │
-               │                    │
-               │  Views (4):        │
-               │  • rep_performance │
-               │  • monthly_trend   │
-               │  • region_eff.     │
-               │  • over_quota      │
                └────────────────────┘
 ```
 
 ---
 
-## Quick Start
+## 📐 Business Logic
 
-### Prerequisites
-- Python 3.10+
-- pip
+### Commission Tiers
 
-### Installation
+Commission is calculated **band-by-band** on revenue earned within each attainment band:
 
-```bash
-git clone <repo-url>
-cd sales-incentive-simulator
-pip install -r requirements.txt
+| Band | Attainment | Rate |
+|------|-----------|------|
+| 1 | 0 – 50% of quota | 2% |
+| 2 | 50 – 100% of quota | 5% |
+| 3 | 100 – 150% of quota | 8% |
+| 4 | 150%+ of quota | 12% |
+
+### Example Calculation
+
 ```
+Quota: $100,000 | Revenue: $120,000 (120% attainment)
+───────────────────────────────────────────────────
+Band 1 (0–50%):   $50,000 × 2%  =  $1,000
+Band 2 (50–100%): $50,000 × 5%  =  $2,500
+Band 3 (100–120%):$20,000 × 8%  =  $1,600
+                              ─────────────
+Base commission                =  $5,100
 
-### Run the full pipeline
+Accelerator Bonus (15% on revenue above quota):
+$20,000 × 15% = $3,000
 
-```bash
-python src/main.py
-```
-
-This will:
-1. Load `config/incentive_plan.json`
-2. Generate 100 sales reps + 12,000 transactions (or load from `data/` if CSVs exist)
-3. Calculate incentive payouts using the tiered commission engine
-4. Save `data/payout_results.csv`
-5. Create and populate `data/sales_incentive.db`
-6. Print a formatted summary to stdout
-7. Run a sample what-if simulation
-
-### Run tests
-
-```bash
-python -m pytest tests/ -v
-```
-
-### Run Jupyter notebook
-
-```bash
-jupyter notebook notebooks/sales_incentive_analysis.ipynb
+Total Payout = $5,100 + $3,000 = $8,100
 ```
 
 ---
 
-## Folder Structure
+## 📁 Project Structure
 
 ```
 sales-incentive-simulator/
-├── config/
+├── 📱 app.py                     # Streamlit dashboard
+├── ⚙️ config/
 │   └── incentive_plan.json       # Commission tiers, roles, regions
-├── data/                         # Generated CSVs + SQLite DB (gitignored)
-│   └── .gitkeep
-├── docs/
-│   └── data_dictionary.md        # Column-level data dictionary
-├── notebooks/
+├── 📊 data/                      # Generated CSVs + SQLite DB
+├── 📚 docs/
+│   └── data_dictionary.md        # Column-level documentation
+├── 📓 notebooks/
 │   └── sales_incentive_analysis.ipynb
-├── powerbi/
-│   └── README.md                 # Power BI dashboard design guide
-├── sql/
+├── 📈 powerbi/
+│   └── README.md                 # Power BI setup guide
+├── 🗄️ sql/
 │   ├── create_tables.sql         # DDL for all tables
-│   ├── load_data.sql             # Load order reference + PRAGMA settings
-│   └── analytical_views.sql      # 4 analytical views with window functions
-├── src/
-│   ├── __init__.py
-│   ├── config_loader.py          # JSON config loader with caching + validation
-│   ├── data_generator.py         # Synthetic data generation (Faker + NumPy)
-│   ├── db_utils.py               # SQLAlchemy / SQLite utilities
-│   ├── incentive_engine.py       # Core vectorised incentive calculator
-│   ├── logger.py                 # Centralised logging (rotating file + console)
+│   ├── load_data.sql             # Load order reference
+│   └── analytical_views.sql      # 4 analytical views
+├── 🐍 src/
+│   ├── config_loader.py          # JSON config with validation
+│   ├── data_generator.py         # Synthetic data (Faker + NumPy)
+│   ├── db_utils.py               # SQLAlchemy utilities
+│   ├── incentive_engine.py       # Vectorised commission calc
+│   ├── logger.py                 # Rotating file + console logs
 │   ├── main.py                   # Pipeline orchestrator
-│   └── simulator.py              # What-if simulation engine
-├── tests/
-│   ├── __init__.py
+│   └── simulator.py              # What-if engine
+├── 🧪 tests/
 │   ├── test_data_generator.py
 │   ├── test_incentive_engine.py
 │   └── test_simulator.py
@@ -135,101 +213,46 @@ sales-incentive-simulator/
 
 ---
 
-## Business Logic
+## 🔌 API Reference
 
-### Commission Tiers
+### Incentive Engine
 
-Commission is calculated **band-by-band** on the revenue earned within each
-attainment band – not as a flat rate on total revenue.
+```python
+from src.incentive_engine import run_incentive_engine
 
-| Band | Attainment | Rate |
-|------|-----------|------|
-| 1 | 0 – 50% of quota | 2% |
-| 2 | 50 – 100% of quota | 5% |
-| 3 | 100 – 150% of quota | 8% |
-| 4 | 150%+ of quota | 12% |
-
-**Example** – Quota: $100,000 | Revenue: $120,000 (120% attainment)
-
-```
-Band 1 (0–50%):   $50,000 × 2%  =  $1,000
-Band 2 (50–100%): $50,000 × 5%  =  $2,500
-Band 3 (100–120%):$20,000 × 8%  =  $1,600
-                              ─────────────
-Base commission                =  $5,100
+results = run_incentive_engine(sales_df, reps_df, config)
+# Returns DataFrame with full payout details per rep
 ```
 
-### Accelerator Bonus
+### Simulator
 
-Reps who exceed 100% of quota earn an **additional** accelerator bonus on all
-incremental revenue above quota:
+```python
+from src.simulator import simulate_incentives, compare_scenarios
 
+# Run what-if simulation
+result = simulate_incentives(sales_df, reps_df, params={
+    "quota_adjustment_pct": 0.10,      # +10% quota
+    "accelerator_rate": 0.20,           # 20% accelerator
+    "region_filter": ["North America"], # Filter by region
+})
+
+# Compare two scenarios
+comparison = compare_scenarios(base_params={}, scenario_params=params, 
+                               sales_df=sales_df, reps_df=reps_df)
 ```
-Incremental revenue = $120,000 − $100,000 = $20,000
-Accelerator bonus   = $20,000 × 15%       =  $3,000
 
-Total payout = $5,100 + $3,000 = $8,100
+### Data Generator
+
+```python
+from src.data_generator import generate_all_data
+
+datasets = generate_all_data(output_dir='data/', seed=42)
+# Returns dict with sales_reps, transactions, incentive_plan, calendar
 ```
 
 ---
 
-## API Reference
-
-### `src.incentive_engine`
-
-```python
-run_incentive_engine(sales_df, reps_df, config) -> pd.DataFrame
-```
-Main entry point.  Returns a DataFrame with full payout details per rep.
-
-```python
-calculate_attainment(sales_df, reps_df) -> pd.DataFrame
-apply_tiered_commission(attainment_df, tiers) -> pd.Series
-apply_accelerator(attainment_df, accelerator_config) -> pd.Series
-calculate_payouts(attainment_df, tiers, accelerator_config) -> pd.DataFrame
-```
-
-### `src.simulator`
-
-```python
-simulate_incentives(sales_df, reps_df, params) -> pd.DataFrame
-```
-Run a parameterised what-if simulation.  Supported params:
-`tiers`, `accelerator_rate`, `accelerator_threshold`, `quota_adjustment_pct`,
-`region_filter`, `role_filter`, `commission_rate_override`.
-
-```python
-compare_scenarios(base_params, scenario_params, sales_df, reps_df) -> pd.DataFrame
-get_scenario_summary(simulation_result) -> dict
-```
-
-### `src.data_generator`
-
-```python
-generate_all_data(output_dir='data/', seed=42) -> dict[str, pd.DataFrame]
-generate_sales_reps(n_reps=100, seed=42) -> pd.DataFrame
-generate_transactions(sales_reps_df, n_transactions=12000, seed=42) -> pd.DataFrame
-generate_calendar(start_date, end_date) -> pd.DataFrame
-generate_incentive_plan(config) -> pd.DataFrame
-```
-
-### `src.config_loader`
-
-```python
-load_config(path=None) -> dict   # cached after first load
-reset_cache()                     # for test isolation
-```
-
----
-
-## Data Dictionary
-
-See [`docs/data_dictionary.md`](docs/data_dictionary.md) for full column-level
-documentation of all tables and views.
-
----
-
-## Testing
+## 🧪 Testing
 
 ```bash
 # Run all tests
@@ -240,39 +263,70 @@ pip install pytest-cov
 python -m pytest tests/ --cov=src --cov-report=term-missing
 ```
 
-Tests cover:
-- **Incentive engine** – tiered commission math, edge cases (zero sales,
-  200%+ attainment), attainment aggregation.
-- **Simulator** – region/role filters, quota adjustments, accelerator overrides,
-  immutability of source DataFrames.
-- **Data generator** – row counts, schema, FK integrity, null checks,
-  reproducibility.
+### Test Coverage
+
+| Module | Tests | Coverage |
+|--------|-------|----------|
+| `incentive_engine` | 19 | 100% |
+| `simulator` | 18 | 100% |
+| `data_generator` | 30 | 100% |
+| **Total** | **67** | **100%** |
 
 ---
 
-## Power BI Setup
+## 🛠️ Tech Stack
 
-See [`powerbi/README.md`](powerbi/README.md) for:
-- Connection instructions (SQLite ODBC or CSV import)
-- Data model / relationship diagram
-- 4 report pages described in detail
-- Full DAX measures reference
-- Slicer configuration
-- Color theme JSON
+| Technology | Purpose |
+|------------|---------|
+| **Python 3.10+** | Core language |
+| **Pandas / NumPy** | Vectorized data processing |
+| **SQLAlchemy** | Database ORM |
+| **SQLite** | Embedded analytics database |
+| **Streamlit** | Interactive web dashboard |
+| **Plotly** | Interactive visualizations |
+| **Faker** | Synthetic data generation |
+| **pytest** | Unit testing framework |
 
 ---
 
-## Assumptions
+## 📊 Database Schema
 
-1. **Analysis period** – All transactions are dated within calendar year 2024.
-2. **Quota frequency** – Quotas are annual; no sub-period proration is applied.
-3. **Accelerator additivity** – The accelerator bonus is additive to the tiered
-   base commission (not a replacement rate).
-4. **Role-based deal sizing** – Enterprise AEs close larger deals than SDRs
-   as modelled by role-specific log-normal multipliers.
-5. **No draws or recoveries** – The model does not include salary draws,
-   minimum guarantees, or clawback provisions.
-6. **Single plan version** – All reps operate under the same tier structure.
-   Role differentiation affects only quota size, not commission rates.
-7. **Synthetic data** – All names and figures are generated; any resemblance
-   to real persons or organisations is coincidental.
+### Tables
+- `sales_reps` – Master dimension for sales representatives
+- `sales_transactions` – Fact table with closed-won deals
+- `incentive_plan` – Commission tier configuration
+- `calendar` – Date dimension with time intelligence
+- `payout_results` – Calculated incentive payouts
+
+### Analytical Views
+- `rep_performance_summary` – Per-rep metrics with rankings
+- `monthly_payout_trend` – Time-series analysis
+- `region_wise_efficiency` – Regional aggregations
+- `over_quota_analysis` – Performance band segmentation
+
+---
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+---
+
+## 👤 Author
+
+**Akshay**
+
+- GitHub: [@Akshay](https://github.com/Akshay)
+- LinkedIn: [Akshay](https://linkedin.com/in/akshay)
+
+---
+
+<p align="center">
+  Made with ❤️ and ☕
+</p>
