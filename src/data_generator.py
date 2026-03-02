@@ -218,9 +218,9 @@ def generate_transactions(
     )
     _validate_fk_integrity(df, sales_reps_df)
     logger.info(
-        "Generated %d transactions. Total revenue: $%,.0f.",
+        "Generated %d transactions. Total revenue: $%s.",
         n_transactions,
-        df["deal_amount"].sum(),
+        f"{df['deal_amount'].sum():,.0f}",
     )
     return df
 
@@ -358,7 +358,7 @@ def generate_all_data(
 
     datasets: dict[str, pd.DataFrame] = {
         "sales_reps": sales_reps,
-        "transactions": transactions,
+        "sales_transactions": transactions,
         "incentive_plan": incentive_plan,
         "calendar": calendar,
     }

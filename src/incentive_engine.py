@@ -154,8 +154,8 @@ def apply_tiered_commission(
 
     result = pd.Series(base_commission, index=attainment_df.index, name="base_commission")
     logger.debug(
-        "Tiered commission calculated. Mean base commission: $%,.2f.",
-        result.mean(),
+        "Tiered commission calculated. Mean base commission: $%s.",
+        f"{result.mean():,.2f}",
     )
     return result
 
@@ -208,9 +208,9 @@ def apply_accelerator(
     )
     pct_qualifying = above_threshold_mask.mean() * 100
     logger.debug(
-        "Accelerator applied. %.1f%% of reps qualify. Mean bonus: $%,.2f.",
+        "Accelerator applied. %.1f%% of reps qualify. Mean bonus: $%s.",
         pct_qualifying,
-        result[above_threshold_mask].mean() if above_threshold_mask.any() else 0.0,
+        f"{result[above_threshold_mask].mean():,.2f}" if above_threshold_mask.any() else "0.00",
     )
     return result
 
@@ -319,13 +319,13 @@ def run_incentive_engine(
 
     logger.info(
         "Incentive engine complete.\n"
-        "  Total revenue   : $%12,.0f\n"
-        "  Total payout    : $%12,.0f\n"
+        "  Total revenue   : $%s\n"
+        "  Total payout    : $%s\n"
         "  Payout ratio    : %.2f%%\n"
         "  Avg attainment  : %.1f%%\n"
         "  %% above quota  : %.1f%%",
-        total_revenue,
-        total_payout,
+        f"{total_revenue:>12,.0f}",
+        f"{total_payout:>12,.0f}",
         overall_payout_ratio * 100,
         avg_attainment,
         pct_above_quota,

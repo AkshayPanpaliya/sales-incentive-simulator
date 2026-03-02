@@ -220,14 +220,14 @@ class TestGenerateAllData:
         with tempfile.TemporaryDirectory() as tmpdir:
             datasets = generate_all_data(output_dir=tmpdir, seed=42)
         assert set(datasets.keys()) == {
-            "sales_reps", "transactions", "incentive_plan", "calendar"
+            "sales_reps", "sales_transactions", "incentive_plan", "calendar"
         }
 
     def test_csvs_are_written(self) -> None:
         """One CSV file per dataset must be written to output_dir."""
         with tempfile.TemporaryDirectory() as tmpdir:
             generate_all_data(output_dir=tmpdir, seed=42)
-            for name in ("sales_reps", "transactions", "incentive_plan", "calendar"):
+            for name in ("sales_reps", "sales_transactions", "incentive_plan", "calendar"):
                 assert os.path.isfile(os.path.join(tmpdir, f"{name}.csv")), (
                     f"Missing CSV: {name}.csv"
                 )
@@ -242,12 +242,12 @@ class TestGenerateAllData:
         """generate_all_data must produce exactly 12,000 transactions."""
         with tempfile.TemporaryDirectory() as tmpdir:
             datasets = generate_all_data(output_dir=tmpdir, seed=42)
-        assert len(datasets["transactions"]) == 12_000
+        assert len(datasets["sales_transactions"]) == 12_000
 
     def test_fk_integrity_in_all_data(self) -> None:
         """All transaction rep_ids must exist in sales_reps."""
         with tempfile.TemporaryDirectory() as tmpdir:
             datasets = generate_all_data(output_dir=tmpdir, seed=42)
         valid_ids = set(datasets["sales_reps"]["rep_id"].tolist())
-        orphans = set(datasets["transactions"]["rep_id"].tolist()) - valid_ids
+        orphans = set(datasets["sales_transactions"]["rep_id"].tolist()) - valid_ids
         assert len(orphans) == 0, f"FK violation: {orphans}"

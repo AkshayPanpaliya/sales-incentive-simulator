@@ -53,7 +53,7 @@ def _load_or_generate_data() -> dict[str, pd.DataFrame]:
     """
     expected_files = {
         "sales_reps": os.path.join(_DATA_DIR, "sales_reps.csv"),
-        "transactions": os.path.join(_DATA_DIR, "transactions.csv"),
+        "sales_transactions": os.path.join(_DATA_DIR, "sales_transactions.csv"),
         "incentive_plan": os.path.join(_DATA_DIR, "incentive_plan.csv"),
         "calendar": os.path.join(_DATA_DIR, "calendar.csv"),
     }
@@ -163,7 +163,7 @@ def main() -> None:
 
     # ── Step 2: Data ────────────────────────────────────────────────────────
     datasets = _load_or_generate_data()
-    sales_df = datasets["transactions"]
+    sales_df = datasets["sales_transactions"]
     reps_df = datasets["sales_reps"]
 
     # ── Step 3: Incentive engine ────────────────────────────────────────────

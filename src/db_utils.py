@@ -216,11 +216,17 @@ def _execute_sql_file(engine: Engine, path: Path, label: str) -> None:
 
     sql_text = path.read_text(encoding="utf-8")
 
-    # Split on semicolons, filter out blank or comment-only segments.
+    # Split on semicolons; strip leading/trailing whitespace from each segment.
+    # A segment is only skipped if it has no non-comment, non-blank lines,
+    # i.e. every non-empty line starts with "--".
+    def _is_executable(segment: str) -> bool:
+        lines = [ln.strip() for ln in segment.splitlines()]
+        return any(ln and not ln.startswith("--") for ln in lines)
+
     statements = [
         stmt.strip()
         for stmt in sql_text.split(";")
-        if stmt.strip() and not stmt.strip().startswith("--")
+        if _is_executable(stmt)
     ]
 
     with engine.begin() as conn:

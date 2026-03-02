@@ -241,8 +241,8 @@ def compare_scenarios(
     ).fillna(0.0)
 
     logger.info(
-        "Comparison complete. Aggregate payout delta: $%+,.0f.",
-        comparison["payout_delta"].sum(),
+        "Comparison complete. Aggregate payout delta: $%s.",
+        f"{comparison['payout_delta'].sum():+,.0f}",
     )
     return comparison
 
