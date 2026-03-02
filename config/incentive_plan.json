@@ -1,0 +1,30 @@
+{
+  "version": "1.0",
+  "effective_from": "2024-01-01",
+  "tiers": [
+    {"threshold_min": 0.0, "threshold_max": 0.5, "commission_rate": 0.02},
+    {"threshold_min": 0.5, "threshold_max": 1.0, "commission_rate": 0.05},
+    {"threshold_min": 1.0, "threshold_max": 1.5, "commission_rate": 0.08},
+    {"threshold_min": 1.5, "threshold_max": 999.0, "commission_rate": 0.12}
+  ],
+  "accelerator": {
+    "threshold": 1.0,
+    "rate": 0.15
+  },
+  "roles": {
+    "Enterprise AE": {"quota_min": 800000, "quota_max": 1200000},
+    "Mid-Market AE": {"quota_min": 400000, "quota_max": 700000},
+    "SMB AE": {"quota_min": 150000, "quota_max": 300000},
+    "SDR": {"quota_min": 100000, "quota_max": 200000},
+    "Sales Manager": {"quota_min": 1500000, "quota_max": 2500000}
+  },
+  "regions": ["North America", "EMEA", "APAC", "LATAM"],
+  "product_categories": [
+    "Enterprise Software",
+    "Cloud Services",
+    "Professional Services",
+    "Hardware",
+    "Support & Maintenance"
+  ],
+  "customer_segments": ["Enterprise", "Mid-Market", "SMB", "Government"]
+}
