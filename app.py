@@ -333,7 +333,7 @@ def render_executive_dashboard(data, config):
     top_performers["total_payout"] = top_performers["total_payout"].apply(format_currency)
     top_performers.columns = ["Rep Name", "Region", "Role", "Revenue", "Quota", "Attainment", "Payout"]
     
-    st.dataframe(top_performers, use_container_width=True, hide_index=True)
+    st.dataframe(top_performers, width='stretch', hide_index=True)
 
 
 # ============================================================================
@@ -477,7 +477,7 @@ def render_rep_performance(data, config):
             "accelerator_bonus": "${:,.0f}",
             "total_payout": "${:,.0f}"
         }).background_gradient(subset=["attainment_pct"], cmap="RdYlGn"),
-        use_container_width=True,
+        width='stretch',
         hide_index=True
     )
 
@@ -561,9 +561,16 @@ def render_simulator(data, config):
     st.markdown("---")
     
     # Run Simulation Button
-    if st.button("🚀 Run Simulation", type="primary", use_container_width=True):
+    if st.button("🚀 Run Simulation", type="primary", width='stretch'):
         with st.spinner("Running simulation..."):
-            # Build params
+            # Build base params (with same filters for fair comparison)
+            base_params = {}
+            if region_filter:
+                base_params["region_filter"] = region_filter
+            if role_filter:
+                base_params["role_filter"] = role_filter
+            
+            # Build scenario params
             scenario_params = {
                 "quota_adjustment_pct": quota_adj / 100,
                 "accelerator_rate": accel_rate / 100,
@@ -583,8 +590,12 @@ def render_simulator(data, config):
             
             # Run simulations
             try:
-                base_result = simulate_incentives(sales, reps, params={})
+                base_result = simulate_incentives(sales, reps, params=base_params)
                 scenario_result = simulate_incentives(sales, reps, params=scenario_params)
+                
+                if base_result.empty or scenario_result.empty:
+                    st.warning("No data available for the selected filters. Please adjust your filter criteria.")
+                    return
                 
                 base_summary = get_scenario_summary(base_result)
                 scenario_summary = get_scenario_summary(scenario_result)
@@ -631,31 +642,59 @@ def render_simulator(data, config):
                 comparison["delta"] = comparison["total_payout_scenario"] - comparison["total_payout_base"]
                 comparison = comparison.sort_values("delta", ascending=True)
                 
+                # Show top winners and losers
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown("#### 📈 Top Winners")
+                    top_winners = comparison.nlargest(5, "delta")[["rep_name", "delta"]].copy()
+                    top_winners["delta"] = top_winners["delta"].apply(lambda x: f"${x:+,.0f}")
+                    st.dataframe(top_winners, width='stretch', hide_index=True)
+                
+                with col2:
+                    st.markdown("#### 📉 Most Impacted")
+                    top_losers = comparison.nsmallest(5, "delta")[["rep_name", "delta"]].copy()
+                    top_losers["delta"] = top_losers["delta"].apply(lambda x: f"${x:+,.0f}")
+                    st.dataframe(top_losers, width='stretch', hide_index=True)
+                
+                # Chart limited to top 30 for readability
+                chart_data = comparison.head(30) if len(comparison) > 30 else comparison
+                if len(comparison) > 30:
+                    st.caption(f"Showing 30 of {len(comparison)} reps (sorted by payout change)")
+                
                 fig = go.Figure()
                 fig.add_trace(go.Bar(
                     name='Base',
-                    y=comparison["rep_name"],
-                    x=comparison["total_payout_base"],
+                    y=chart_data["rep_name"],
+                    x=chart_data["total_payout_base"],
                     orientation='h',
                     marker_color='#90CAF9'
                 ))
                 fig.add_trace(go.Bar(
                     name='Scenario',
-                    y=comparison["rep_name"],
-                    x=comparison["total_payout_scenario"],
+                    y=chart_data["rep_name"],
+                    x=chart_data["total_payout_scenario"],
                     orientation='h',
                     marker_color='#0F4C81'
                 ))
                 fig.update_layout(
                     barmode='group',
-                    height=max(400, len(comparison) * 25),
+                    height=max(400, len(chart_data) * 25),
                     margin=dict(l=20, r=20, t=30, b=20),
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02)
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02),
+                    xaxis_title="Payout ($)",
+                    yaxis_title=""
                 )
                 st.plotly_chart(fig, use_container_width=True)
                 
+                # Success message with summary
+                st.success(f"✅ Simulation complete! {len(comparison)} reps analyzed. "
+                          f"Net payout {'increase' if payout_delta > 0 else 'decrease'}: {format_currency(abs(payout_delta))} ({payout_pct:+.1f}%)")
+                
+            except ValueError as e:
+                st.warning(f"⚠️ {str(e)}")
             except Exception as e:
-                st.error(f"Error running simulation: {str(e)}")
+                st.error(f"❌ Error running simulation: {str(e)}")
+                st.info("Please check your parameter values and try again.")
     else:
         st.info("👆 Adjust the parameters above and click 'Run Simulation' to see results")
 
@@ -672,7 +711,7 @@ def render_data_explorer(data, config):
     
     with tab1:
         st.markdown("### Sales Representatives")
-        st.dataframe(data["sales_reps"], use_container_width=True, hide_index=True)
+        st.dataframe(data["sales_reps"], width='stretch', hide_index=True)
         st.download_button(
             "📥 Download CSV",
             data["sales_reps"].to_csv(index=False),
@@ -683,7 +722,7 @@ def render_data_explorer(data, config):
     with tab2:
         st.markdown("### Sales Transactions")
         st.markdown(f"**{len(data['sales_transactions']):,} transactions**")
-        st.dataframe(data["sales_transactions"].head(1000), use_container_width=True, hide_index=True)
+        st.dataframe(data["sales_transactions"].head(1000), width='stretch', hide_index=True)
         st.caption("Showing first 1,000 rows")
         st.download_button(
             "📥 Download CSV",
@@ -704,7 +743,7 @@ def render_data_explorer(data, config):
                 "total_payout": "${:,.0f}",
                 "payout_to_revenue_ratio": "{:.2%}"
             }),
-            use_container_width=True,
+            width='stretch',
             hide_index=True
         )
         st.download_button(
