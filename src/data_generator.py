@@ -57,8 +57,13 @@ _ROLE_DEAL_MULTIPLIER: dict[str, float] = {
     "Sales Manager": 2.5,
 }
 
-_BASE_DEAL_MEAN: float = 45_000.0   # target mean deal amount across all reps
-_DEAL_LOG_SIGMA: float = 0.8        # log-normal shape parameter
+# Calibrated (see notebooks/sales_incentive_analysis.ipynb, "Data Calibration"
+# section) so that, combined with the quota bands in config/incentive_plan.json
+# and ~120 deals/rep/year, average quota attainment lands around 100-115%,
+# with a realistic spread (~35% strugglers to ~190% top performers) instead of
+# an unrealistic 1000%+ average.
+_BASE_DEAL_MEAN: float = 3_000.0    # target mean deal amount across all reps
+_DEAL_LOG_SIGMA: float = 1.0        # log-normal shape parameter
 
 
 # ---------------------------------------------------------------------------

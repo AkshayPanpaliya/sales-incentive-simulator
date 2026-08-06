@@ -27,6 +27,18 @@
 
 ---
 
+## 💡 Why This Project
+
+Sales-force incentive compensation design — setting quotas, tiered commission
+bands, and accelerators, then simulating "what-if" plan changes before rolling
+them out — is a core analytics problem for consulting firms that work with
+commercial sales organizations. This project reproduces that workflow
+end-to-end: synthetic-but-realistic rep/transaction data → a vectorised
+commission engine → a what-if simulator → SQL analytical views → a Power BI
+/ Streamlit-ready reporting layer, all backed by a 67-test suite.
+
+---
+
 ## ✨ Features
 
 - 🎯 **Tiered Commission Engine** – Band-by-band commission calculation with vectorized NumPy operations
@@ -51,11 +63,14 @@
 
 | Metric | Value |
 |--------|-------|
-| Total Revenue | $888M |
-| Total Payout | $224M |
-| Payout Ratio | 25.27% |
+| Total Revenue | $59.8M |
+| Total Payout | $3.5M |
+| Payout Ratio | 5.82% |
+| Avg. Quota Attainment | 107.6% |
 | Reps Processed | 100 |
 | Transactions | 12,000 |
+
+*(Generated with the default seed=42 — run `python src/main.py` to reproduce exactly.)*
 
 ---
 
@@ -69,7 +84,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/sales-incentive-simulator.git
+git clone https://github.com/AkshayPanpaliya/sales-incentive-simulator.git
 cd sales-incentive-simulator
 
 # Install dependencies
@@ -320,10 +335,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 👤 Author
 
-**Akshay**
+**Akshay Panpaliya**
 
-- GitHub: [@Akshay](https://github.com/Akshay)
-- LinkedIn: [Akshay](https://linkedin.com/in/akshay)
+- GitHub: [@AkshayPanpaliya](https://github.com/AkshayPanpaliya)
+- LinkedIn: [akshay-panpaliya](https://linkedin.com/in/akshay-panpaliya/)
 
 ---
 
